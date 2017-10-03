@@ -36,6 +36,7 @@ func NewController(vconfig *vaultapi.Config, kconfig *rest.Config) (kube.SecretC
 	if err != nil {
 		return nil, err
 	}
+
 	kclient, err := kubernetes.NewForConfig(kconfig)
 	if err != nil {
 		return nil, err
