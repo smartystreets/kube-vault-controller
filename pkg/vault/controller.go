@@ -1,6 +1,8 @@
 package vault
 
 import (
+	"crypto/x509"
+	"encoding/pem"
 	"errors"
 	"fmt"
 	"log"
@@ -163,6 +165,13 @@ func (ctrl *controller) DeleteSecret(claim *kube.SecretClaim) error {
 func secretFromVault(claim *kube.SecretClaim, secret *vaultapi.Secret) *v1.Secret {
 	leaseDuration := time.Duration(secret.LeaseDuration) * time.Second
 	leaseExpiration := time.Now().Add(leaseDuration).Unix()
+	if cpem, ok := secret.Data[PKICertificateKey]; ok {
+		b, _ := pem.Decode([]byte(cpem.(string)))
+		if c, err := x509.ParseCertificate(b.Bytes); err == nil {
+			log.Printf("certificate expiration: %s", c.NotAfter)
+			leaseExpiration = c.NotAfter.Unix()
+		}
+	}
 	return &v1.Secret{
 		ObjectMeta: v1.ObjectMeta{
 			Name:      claim.Name,
