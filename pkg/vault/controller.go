@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"strconv"
+	"strings"
 	"time"
 
 	vaultapi "github.com/hashicorp/vault/api"
@@ -22,6 +23,7 @@ const (
 
 	PKICertificateKey = "certificate"
 	PKIPrivateKeyKey  = "private_key"
+	PKICAChain        = "ca_chain"
 )
 
 type controller struct {
@@ -252,6 +254,14 @@ func dataForSecret(claim *kube.SecretClaim, secret *vaultapi.Secret) map[string]
 	case v1.SecretTypeTLS:
 		data[v1.TLSCertKey] = []byte(secret.Data[PKICertificateKey].(string))
 		data[v1.TLSPrivateKeyKey] = []byte(secret.Data[PKIPrivateKeyKey].(string))
+
+		chainInterface := secret.Data[PKICAChain].([]interface{})
+		chain := make([]string, len(chainInterface))
+		for i := range chainInterface {
+			chain[i] = chainInterface[i].(string)
+		}
+
+		data["ca.crt"] = []byte(strings.Join(chain, "\n"))
 	default:
 		for key, val := range secret.Data {
 			datom, _ := val.(string)
