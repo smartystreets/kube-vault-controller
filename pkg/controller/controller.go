@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"log"
 	"time"
 
 	vaultapi "github.com/hashicorp/vault/api"
@@ -40,8 +39,9 @@ func New(config *Config, vconfig *vaultapi.Config, kconfig *rest.Config) (*Contr
 	}
 
 	if config.SAAuth {
-		log.Printf("Using k8s service account auth")
-		vaultController.Login(config.VaultRole)
+		if err := vaultController.Login(config.VaultRole); err != nil {
+			return nil, err
+		}
 	}
 
 	claims, claimCtrl := cache.NewInformer(claimSource, &kube.SecretClaim{}, config.SyncPeriod, newSecretClaimHandler(vaultController))

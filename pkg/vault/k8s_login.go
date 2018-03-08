@@ -8,18 +8,19 @@ import (
 
 const serviceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
-func (ctrl *controller) Login(vaultRole string) {
+func (ctrl *controller) Login(vaultRole string) error {
+	log.Printf("vault-controller: logging with k8s service account")
 
 	jwt, err := ioutil.ReadFile(serviceAccountTokenFile)
 
 	if err != nil {
 		log.Printf("error: Service account token file.")
-		return
+		return err
 	}
 
 	if vaultRole == "" {
 		log.Printf("error: Vault role missing.")
-		return
+		return err
 	}
 
 	token, err := ctrl.vclient.Logical().Write("auth/kubernetes/login", map[string]interface{}{
@@ -29,12 +30,14 @@ func (ctrl *controller) Login(vaultRole string) {
 
 	if err != nil {
 		log.Printf("could not login with service account: %s", err)
-		return
+		return err
 	}
 
 	ctrl.vclient.SetToken(token.Auth.ClientToken)
 
 	ctrl.authTokenRenew(int64(token.Auth.LeaseDuration))
+
+	return nil
 }
 
 func (ctrl *controller) authTokenRenew(initialTTL int64) {
