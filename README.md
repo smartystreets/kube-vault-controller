@@ -1,6 +1,5 @@
-# kube-vault-controller [![CircleCI](https://circleci.com/gh/roboll/kube-vault-controller.svg?style=svg)](https://circleci.com/gh/roboll/kube-vault-controller)
+# kube-vault-controller
 
-[![Docker Repository on Quay](https://quay.io/repository/roboll/kube-vault-controller/status "Docker Repository on Quay")](https://quay.io/repository/roboll/kube-vault-controller)
 
 Claim secrets from [Vault](https://vaultproject.io) for use in Kubernetes.
 

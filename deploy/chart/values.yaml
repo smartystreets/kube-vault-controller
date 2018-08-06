@@ -2,9 +2,45 @@
 # This is a YAML-formatted file.
 # Declare name/value pairs to be passed into your templates.
 # name: value
-Image: quay.io/roboll/kube-vault-controller:v0.3.0
+
+# Original was "quay.io/roboll/kube-vault-controller:v0.3.0"
+Image: xtruder/kube-vault-controller:v0.3.1
 Namespace: kube-system
 
-VaultToken: ""
-VaultAddress: ""
+# How often secrets should be checked for updates. To ensure secrets are renewed
+# before their lease expires, ensure your sync period is smaller than your
+# smallest claimed renewal time.
+SyncPeriod: 1m
+
+# Limit watched namespace to this
 WatchNamespace: ""
+
+# Address of vault, e.g.: https://vault.example.com:8200
+VaultAddress: "https://vault:8200"
+
+# If false (default) use the specified VaultToken for authentication. If true,
+# uses Vault's Kubernetes authentication method which passes the pod's active
+# service account with the specified VaultRole to the VaultAuth path.
+ServiceAccountAuth: false
+
+# Kubernetes auth path when using Vault's Kubernetes authentication
+# Only used if ServiceAccountAuth is true.
+VaultAuth: kubernetes
+
+# Vault role to bind to (see Vault's Kubernetes authentication).
+# Only used if ServiceAccountAuth is true.
+VaultRole: default
+
+# Name of the kubernetes secret where the Vault token will be stored
+# Only used if ServiceAccountAuth is false.
+VaultSecret: vault-secret
+
+# Authorized token for vault login
+# Only used if ServiceAccountAuth is false.
+VaultToken: ""
+
+
+### Vault Client Tweaks
+VaultClientSkipTLSVerify: false
+VaultClientRateLimit: 0
+VaultClientRetries: 0
