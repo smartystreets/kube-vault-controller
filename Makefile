@@ -1,6 +1,6 @@
 TAG     := $(shell git describe --tags --abbrev=0 HEAD)
 PKGS    := $(shell go list ./... | grep -v /vendor/)
-PREFIX  := xtruder
+PREFIX  := quay.io/smartyjohn
 
 generate:
 	go generate ${PKGS}
