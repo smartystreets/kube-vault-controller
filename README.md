@@ -1,5 +1,6 @@
 # kube-vault-controller
 
+[![Docker Repository on Quay](https://quay.io/repository/smartyjohn/kube-vault-controller/status "Docker Repository on Quay")](https://quay.io/repository/smartyjohn/kube-vault-controller)
 
 Claim secrets from [Vault](https://vaultproject.io) for use in Kubernetes.
 
@@ -9,11 +10,11 @@ Claim secrets from [Vault](https://vaultproject.io) for use in Kubernetes.
 * Use Kubernetes secret objects, including TLS type for ingress.
 * Configurable lease renewal buffer, automatically rotate secrets for expiring leases.
 * Easy ops: no persistent storage, everything stored in Kubernetes.
+* Per secret Vault authentication with [token](https://www.vaultproject.io/docs/auth/token.html) or [app role](https://www.vaultproject.io/docs/auth/approle.html).
 
 
 ## TODO
 
-* Per secret Vault authentication with [token](https://www.vaultproject.io/docs/auth/token.html) or [app role](https://www.vaultproject.io/docs/auth/approle.html).
 * Add `--ingres-label` flag and watch ingress to fulfill tls spec.
 * Template several secret values into a single datom.
 * Add service account and RBAC role into chart.
