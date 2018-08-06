@@ -17,8 +17,9 @@ var (
 	kubeconfig = flag.String("kubeconfig", "", "Path to the kubeconfig file. Defaults to in-cluster config.")
 	namespace  = flag.String("namespace", "", "Namespace to watch for claims.")
 
-	saauth    = flag.Bool("saauth", false, "Use kubernetess service account to authenticate with vault.")
-	vaultRole = flag.String("vaultrole", "", "Vault role to bind to. (used by kubernetes authentication")
+	saauth    = flag.Bool("saauth", false, "Use kubernetes service account to authenticate with vault.")
+	vaultAuth = flag.String("vaultauth", "kubernetes", "Vault auth path name to use, defaults to 'kubernetes'.")
+	vaultRole = flag.String("vaultrole", "", "Vault role to bind to. (used by kubernetes authentication)")
 
 	syncPeriod = flag.Duration("sync-period", 0, "Sync all resources each period.")
 )
@@ -49,6 +50,7 @@ func main() {
 		Namespace:  *namespace,
 		SyncPeriod: *syncPeriod,
 		VaultRole:  *vaultRole,
+		VaultAuth:  *vaultAuth,
 		SAAuth:     *saauth,
 	}
 	ctrl, err := controller.New(config, vconfig, kconfig)

@@ -21,6 +21,7 @@ type Config struct {
 	Namespace  string
 	SyncPeriod time.Duration
 	VaultRole  string
+	VaultAuth  string
 	SAAuth     bool
 }
 
@@ -39,7 +40,7 @@ func New(config *Config, vconfig *vaultapi.Config, kconfig *rest.Config) (*Contr
 	}
 
 	if config.SAAuth {
-		if err := vaultController.Login(config.VaultRole); err != nil {
+		if err := vaultController.Login(config.VaultRole, config.VaultAuth); err != nil {
 			return nil, err
 		}
 	}

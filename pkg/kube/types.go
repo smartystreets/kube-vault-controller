@@ -46,5 +46,5 @@ type SecretClaimList struct {
 type SecretClaimManager interface {
 	CreateOrUpdateSecret(claim *SecretClaim, force bool) error
 	DeleteSecret(claim *SecretClaim) error
-	Login(vaultRole string) error
+	Login(vaultRole string, vaultAuth string) error
 }

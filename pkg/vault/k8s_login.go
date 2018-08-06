@@ -8,7 +8,7 @@ import (
 
 const serviceAccountTokenFile = "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
-func (ctrl *controller) Login(vaultRole string) error {
+func (ctrl *controller) Login(vaultRole string, vaultAuth string) error {
 	log.Printf("vault-controller: logging with k8s service account")
 
 	jwt, err := ioutil.ReadFile(serviceAccountTokenFile)
@@ -23,7 +23,12 @@ func (ctrl *controller) Login(vaultRole string) error {
 		return err
 	}
 
-	token, err := ctrl.vclient.Logical().Write("auth/kubernetes/login", map[string]interface{}{
+	if vaultAuth == "" {
+		log.Printf("error: Vault auth path missing.")
+		return err
+	}
+
+	token, err := ctrl.vclient.Logical().Write("auth/" + vaultAuth + "/login", map[string]interface{}{
 		"jwt":  string(jwt[:]),
 		"role": vaultRole,
 	})
