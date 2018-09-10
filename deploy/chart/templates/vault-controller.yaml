@@ -1,5 +1,5 @@
 kind: Deployment
-apiVersion: apps/v1beta2
+apiVersion: apps/v1
 
 metadata:
   name: vault-controller
@@ -40,13 +40,13 @@ spec:
 {{- end }}
 {{- if .Values.VaultClientSkipTLSVerify }}
             - name: VAULT_SKIP_VERIFY
-              value: 1
+              value: "1"
 {{- end }}
 {{- if .Values.VaultClientRateLimit }}
             - name: VAULT_RATE_LIMIT
-              value: {{ .Values.VaultClientRateLimit }}
+              value: {{ .Values.VaultClientRateLimit | quote }}
 {{- end }}
 {{- if .Values.VaultClientRetries }}
             - name: VAULT_MAX_RETRIES
-              value: {{ .Values.VaultClientRetries }}
+              value: {{ .Values.VaultClientRetries | quote }}
 {{- end }}

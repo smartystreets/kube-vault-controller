@@ -1,8 +1,8 @@
 ### Build Image
 
 FROM golang:1.10-alpine AS build
-ARG BIN=kube-vault-controller
-ARG PROJECT=github.com/roboll/$BIN
+ARG BIN=workspace/app
+ARG PROJECT=github.com/roboll/kube-vault-controller
 WORKDIR /go/src/$PROJECT/
 
 # Install tools required for project
@@ -24,7 +24,6 @@ COPY . .
 RUN mkdir -p /deploy/etc/ssl/certs && \
 	cp -p /etc/ssl/certs/ca-certificates.crt /deploy/etc/ssl/certs/ca-certificates.crt && \
 	make build && \
-#	make test && \
     cp -p $BIN /deploy/app
 
 
