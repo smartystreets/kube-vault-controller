@@ -4,7 +4,6 @@
 # name: value
 
 Image: quay.io/smartystreets/kube-vault-controller:0.3.3
-Namespace: kube-system
 
 # How often secrets should be checked for updates. To ensure secrets are renewed
 # before their lease expires, ensure your sync period is smaller than your

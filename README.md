@@ -1,6 +1,6 @@
 # kube-vault-controller
 
-[![Docker Repository on Quay](https://quay.io/repository/smartyjohn/kube-vault-controller/status "Docker Repository on Quay")](https://quay.io/repository/smartyjohn/kube-vault-controller)
+[![Docker Repository on Quay](https://quay.io/repository/smartystreets/kube-vault-controller/status "Docker Repository on Quay")](https://quay.io/repository/smartystreets/kube-vault-controller)
 
 Claim secrets from [Vault](https://vaultproject.io) for use in Kubernetes.
 

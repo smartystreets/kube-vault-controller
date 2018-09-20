@@ -3,7 +3,7 @@ apiVersion: apps/v1
 
 metadata:
   name: vault-controller
-  namespace: {{ .Values.Namespace | quote }}
+  namespace: {{ .Release.Namespace }}
   labels:
 {{ include "pkg.labels" . | indent 4 }}
 spec:
@@ -18,11 +18,11 @@ spec:
       labels:
         app: vault-controller
     spec:
+      serviceAccountName: {{ .Chart.Name }}
       containers:
         - name: vault-controller
           image: {{ .Values.Image }}
-          command:
-            - /kube-vault-controller
+          args:
             - --sync-period={{ .Values.SyncPeriod }}
             - --namespace={{ .Values.WatchNamespace }}
             - --saauth={{ .Values.ServiceAccountAuth }}

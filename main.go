@@ -26,6 +26,7 @@ var (
 
 func main() {
 	flag.Parse()
+	flag.Lookup("logtostderr").Value.Set("true")
 
 	log.Printf("kube-vault-controller starting, sync period %s.", *syncPeriod)
 	if *namespace != "" {
