@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"log"
 	"strconv"
-	"strings"
 	"time"
 
 	vaultapi "github.com/hashicorp/vault/api"
@@ -25,7 +24,11 @@ const (
 
 	PKICertificateKey = "certificate"
 	PKIPrivateKeyKey  = "private_key"
-	PKICAChain        = "ca_chain"
+	PKICAChainKey     = "ca_chain"
+	PKICertificateAltKey = "public"
+	PKIPrivateKeyAltKey  = "private"
+	PKICAChainAltKey     = "chain"
+
 )
 
 type controller struct {
@@ -58,7 +61,7 @@ func (ctrl *controller) CreateOrUpdateSecret(claim *kube.SecretClaim, force bool
 
 	existing, err := ctrl.kclient.Core().Secrets(claim.Namespace).Get(claim.Name)
 	if err != nil {
-		log.Printf("vault-controller: %s: creating secret from path %s", key, claim.Spec.Path)
+		log.Printf("vault-controller: %s: creating secret from path %s (%s)", key, claim.Spec.Path, err.Error())
 		err := ctrl.createSecret(key, claim)
 		if err != nil {
 			log.Printf("vault-controller: %s: created secret from path %s", key, claim.Spec.Path)
@@ -260,23 +263,49 @@ func (ctrl *controller) secretForClaim(claim *kube.SecretClaim) (*v1.Secret, err
 
 func dataForSecret(claim *kube.SecretClaim, secret *vaultapi.Secret) map[string][]byte {
 	data := make(map[string][]byte, len(secret.Data))
+
 	switch claim.Spec.Type {
 	case v1.SecretTypeTLS:
-		data[v1.TLSCertKey] = []byte(secret.Data[PKICertificateKey].(string))
-		data[v1.TLSPrivateKeyKey] = []byte(secret.Data[PKIPrivateKeyKey].(string))
+		if val, ok := trySecretKeys(secret.Data, v1.TLSCertKey, PKICertificateKey, PKICertificateAltKey); ok {
+			temp := val.(string)
 
-		chainInterface := secret.Data[PKICAChain].([]interface{})
-		chain := make([]string, len(chainInterface))
-		for i := range chainInterface {
-			chain[i] = chainInterface[i].(string)
+			if val, ok := trySecretKeys(secret.Data, PKICAChainKey, PKICAChainAltKey); ok {
+				switch x := val.(type) {
+					case string:
+						temp += "\n" + x
+
+					case []string:
+						for i := range x {
+							temp += "\n" + x[i]
+						}
+
+					default:
+						log.Printf("Unhandled vault data type %T", x)
+				}
+			}
+
+			data[v1.TLSCertKey] = []byte(temp)
 		}
 
-		data["ca.crt"] = []byte(strings.Join(chain, "\n"))
+		if val, ok := trySecretKeys(secret.Data, v1.TLSPrivateKeyKey, PKIPrivateKeyKey, PKIPrivateKeyAltKey); ok {
+			data[v1.TLSPrivateKeyKey] = []byte(val.(string))
+		}
+
 	default:
 		for key, val := range secret.Data {
 			datom, _ := val.(string)
 			data[key] = []byte(datom)
 		}
 	}
+
 	return data
+}
+
+func trySecretKeys(data map[string]interface{}, keys ...string) (val interface{}, ok bool) {
+	for _, key := range keys {
+		if val, ok = data[key]; ok {
+			return
+		}
+	}
+	return
 }

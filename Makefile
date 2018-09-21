@@ -5,7 +5,7 @@ REPO  ?= $(or ${DOCKER_SERVER},smartystreets)
 IMAGE := $(REPO)/$(NAME):$(or ${VERSION},local)
 
 PACKAGES := $(shell go list ./... | grep -v /vendor/)
-.PHONY: build generate clean compile check test image publish image-debug
+.PHONY: build generate clean compile check test image publish image-debug images
 
 build: clean test compile
 
@@ -39,3 +39,6 @@ image-debug: DOCKER_FLAGS := -f Dockerfile.debug
 image-debug: GO_FLAGS := -gcflags "all=-N -l"
 image-debug: IMAGE := $(IMAGE)-debug
 image-debug: image
+
+images: image
+	$(MAKE) image-debug
