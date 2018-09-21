@@ -1,12 +1,11 @@
 #!/usr/bin/make -f
 
-IMAGE_NAME      := kube-vault-controller
-IMAGE_PREFIX    ?= quay.io/smartystreets
-CURRENT_VERSION := $(IMAGE_PREFIX)/$(IMAGE_NAME):$(shell git describe --tags 2>/dev/null)
-LATEST_VERSION  := $(IMAGE_PREFIX)/$(IMAGE_NAME):latest
+NAME  := kube-vault-controller
+REPO  ?= $(or ${DOCKER_SERVER},smartystreets)
+IMAGE := $(REPO)/$(NAME):$(or ${VERSION},local)
 
 PACKAGES := $(shell go list ./... | grep -v /vendor/)
-.PHONY: build generate clean dependencies compile check test image publish version
+.PHONY: build generate clean compile check test image publish image-debug
 
 build: clean test compile
 
@@ -16,28 +15,27 @@ generate:
 clean:
 	rm -rf workspace
 
-dependencies:
-#	dep ensure -vendor-only
-
-compile: dependencies
-	CGO_ENABLED=0 go build -o workspace/app .
+compile:
+	GOOS="$(OS)" GOARCH="$(CPU)" CGO_ENABLED=0 go build $(GO_FLAGS) -o workspace/app .
 
 check:
 	go vet ${PACKAGES}
 
-test: dependencies
+test:
 #	// -race requires CGO_ENABLED=1; which needs gcc, muscl-dev
-#	go test -v ${PACKAGES} -cover -race -p=1
-	CGO_ENABLED=0 go test -v ${PACKAGES} -cover -p=1
+	go test -v ${PACKAGES} -race -cover -p=1
 
 ##########################################################
 
-image:
-	docker build . --squash -t "$(CURRENT_VERSION)" -t "$(LATEST_VERSION)"
+image: OS ?= linux
+image: CPU ?= amd64
+image: build
+	docker build . $(DOCKER_FLAGS:-Dockerfile) -t "$(IMAGE)"
 
 publish: image
-	docker push "$(CURRENT_VERSION)"
-	docker push "$(LATEST_VERSION)"
+	docker push "$(IMAGE)"
 
-version:
-	tagit ${TAGIT:--p} && git push origin "`tagit ${TAGIT:--p} --dry-run`"
+image-debug: DOCKER_FLAGS := -f Dockerfile.debug
+image-debug: GO_FLAGS := -gcflags "all=-N -l"
+image-debug: IMAGE := $(IMAGE)-debug
+image-debug: image
