@@ -30,7 +30,7 @@ test:
 image: OS ?= linux
 image: CPU ?= amd64
 image: build
-	docker build . $(DOCKER_FLAGS:-Dockerfile) -t "$(IMAGE)"
+	docker build . $(DOCKER_FLAGS) -t "$(IMAGE)"
 
 publish: image
 	docker push "$(IMAGE)"
