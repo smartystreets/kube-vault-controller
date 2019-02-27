@@ -35,7 +35,7 @@ spec:
             - name: VAULT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  key: vault-token
+                  key: vault_token
                   name: {{ .Values.VaultSecret | quote }}
 {{- end }}
 {{- if .Values.VaultClientSkipTLSVerify }}
