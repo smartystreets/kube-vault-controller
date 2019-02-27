@@ -30,7 +30,10 @@ spec:
             - --vaultrole={{ .Values.VaultRole }}
           env:
             - name: VAULT_ADDR
-              value: {{ .Values.VaultAddress | quote }}
+              valueFrom:
+                secretKeyRef:
+                  key: vault_addr
+                  name: {{ .Values.VaultSecret | quote }}
 {{- if not .Values.ServiceAccountAuth }}
             - name: VAULT_TOKEN
               valueFrom:

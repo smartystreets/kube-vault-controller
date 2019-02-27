@@ -29,8 +29,7 @@ VaultAuth: kubernetes
 # Only used if ServiceAccountAuth is true.
 VaultRole: default
 
-# Name of the kubernetes secret where the Vault token will be stored
-# Only used if ServiceAccountAuth is false.
+# Name of the kubernetes secret where the Vault address and token will be stored
 VaultSecret: vault-secret
 
 # Authorized token for vault login
