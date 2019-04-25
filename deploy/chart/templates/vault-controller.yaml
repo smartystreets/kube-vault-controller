@@ -19,6 +19,7 @@ spec:
         app: vault-controller
     spec:
       serviceAccountName: {{ .Chart.Name }}
+      affinity: {{ trim (toYaml .Values.Affinity) | nindent 8 }}
       containers:
         - name: vault-controller
           image: {{ .Values.Image }}

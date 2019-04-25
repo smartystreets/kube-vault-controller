@@ -5,6 +5,9 @@
 
 Image: quay.io/smartystreets/kube-vault-controller:0.3.4
 
+# Pod scheduling affinity
+Affinity: {}
+
 # How often secrets should be checked for updates. To ensure secrets are renewed
 # before their lease expires, ensure your sync period is smaller than your
 # smallest claimed renewal time.
